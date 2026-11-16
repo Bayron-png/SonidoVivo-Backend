@@ -49,7 +49,7 @@ Documentación interactiva autogenerada en las rutas. Permite inspeccionar los e
 
 El backend está organizado bajo una arquitectura en capas (**Model - Repository - Service - Controller**), separando claramente la estructura de los datos, las consultas SQL, la lógica de negocio y el manejo de peticiones HTTP:
 
-```text
+```
 sonidovivo-backend/
 ├── src/
 │   ├── config/          # Conexión a PostgreSQL y configuración de Swagger
@@ -62,6 +62,7 @@ sonidovivo-backend/
 ├── database.sql         # Script de creación de tablas y roles en PostgreSQL
 ├── package.json         # Dependencias y configuración del proyecto
 └── README.md            # Documentación del proyecto
+```
 
 ## Material Complementario
-- [Drive - Sonido Vivo](https://drive.google.com/drive/folders/12_GrU2BjxDYlcv_tYToIAlKlEODdBjeE?usp=drive_link)
+- [Drive | Sonido Vivo](https://drive.google.com/drive/folders/12_GrU2BjxDYlcv_tYToIAlKlEODdBjeE?usp=drive_link)
