@@ -1,0 +1,43 @@
+# --- Dependencias de Node.js ---
+node_modules/
+jspm_packages/
+
+# --- Variables de entorno y secretos (CRÍTICO) ---
+.env
+.env.local
+.env.development
+.env.production
+.env.*.local
+
+# --- Llaves privadas de AWS EC2 (CRÍTICO) ---
+*.pem
+*.ppk
+*.key
+
+# --- Logs de ejecución y PM2 (en EC2) ---
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pm2/
+
+# --- Respaldos o archivos locales de PostgreSQL ---
+*.sql.bak
+*.dump
+*.backup
+pgdata/
+
+# --- Archivos temporales, build y caché ---
+dist/
+build/
+coverage/
+.nyc_output/
+.cache/
+*.tsbuildinfo
+
+# --- Editores y Sistema Operativo ---
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
