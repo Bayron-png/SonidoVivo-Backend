@@ -25,13 +25,18 @@ Se optó por usar `Node.js` y `Express` debido a los siguientes motivos:
 **Base de Datos**
 
 ### **Base de datos:** PostgreSQL ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=flat&logo=postgresql&logoColor=white)
-PostgreSQL es el motor relacional elegido para garantizar persistencia e integridad referencial entre los datos.
+Se optó por **PostgreSQL** como motor de base de datos relacional
+- **Cumplimiento estricto del estándar SQL e integridad referencial:** Permite definir llaves primarias, foráneas, restricciones (`UNIQUE`, `CHECK`, `NOT NULL`) y tipos de datos estrictos que aseguran la consistencia entre `roles`, `usuarios`, `productos` y `pedidos`.
+- **Transacciones ACID para Control de Stock:** Al gestionar pedidos e inventario de instrumentos, las propiedades ACID evitan inconsistencias o ventas duplicadas cuando dos clientes compran el último producto disponible al mismo tiempo.
 
 ### **Seguridad y Autenticación:** JSON Web Tokens ![JWT](https://img.shields.io/badge/JWT-000000?style=flat&logo=jsonwebtokens&logoColor=white)
 Emisión de tokens firmados con tiempo de expiración para autenticar sesiones sin estado (*stateless*).
 
-### **Infraestructura y Despliegue:** Amazon EC2 ![Amazon EC2](https://img.shields.io/badge/AWS-FF9900?AWS=flat&logo=amazonec2&logoColor=white)
-Instancia Linux en la nube donde se ejecuta el servidor Node.js/Express de forma continua junto con la base de datos PostgreSQL, exponiendo los puertos necesarios mediante *Security Groups*.
+### **Infraestructura y Despliegue:** Amazon EC2 ![Amazon EC2](https://img.shields.io/badge/AWS-FF9900?style=flat&logo=amazonec2&logoColor=white)
+Se eligió desplegar el backend en una instancia **Amazon EC2** en lugar de una arquitectura *serverless* como **AWS Lambda** por las siguientes razones:
+- **Servidor Continuo y Sin Arranques en Frío (*Cold Starts*):** A diferencia de Lambda, donde las funciones se detienen tras periodos de inactividad provocando latencia inicial en las primeras peticiones, EC2 mantiene el proceso de Node.js/Express activo 24/7, ofreciendo tiempos de respuesta inmediatos al navegar por el catálogo.
+- **Compatibilidad Directa con Express y Swagger UI:** EC2 permite ejecutar una aplicación monolítica tradicional en Express sin necesidad de adaptar rutas ni dependencias a eventos de API Gateway, sirviendo tanto la API REST como la interfaz interactiva de Swagger (`/api-docs`) desde el mismo servidor.
+- **Control Total del Entorno y Coexistencia con PostgreSQL:** Brinda acceso directo al sistema operativo Linux para administrar puertos (*Security Groups*), variables de entorno y alojar el motor de base de datos PostgreSQL en la misma infraestructura sin costos ni configuraciones adicionales de VPC complejas.
 
 
 ### **Documentación API:** Swagger [![Swagger](https://img.shields.io/badge/Swagger-API_Docs-85EA2D?style=flat&logo=swagger&logoColor=black)](http://localhost:3000/api-docs)
@@ -57,7 +62,6 @@ sonidovivo-backend/
 ├── database.sql         # Script de creación de tablas y roles en PostgreSQL
 ├── package.json         # Dependencias y configuración del proyecto
 └── README.md            # Documentación del proyecto
-
 
 ## Material Complementario
 - [Drive - Sonido Vivo](https://drive.google.com/drive/folders/12_GrU2BjxDYlcv_tYToIAlKlEODdBjeE?usp=drive_link)
