@@ -1,0 +1,49 @@
+const usuarioService = require('../service/usuario.service');
+
+const handleError = (error, res, operation) => {
+  if (error.statusCode) {
+    return res.status(error.statusCode).json({ error: error.message });
+  }
+
+  console.error(`Error al ${operation}:`, error);
+  return res.status(500).json({ error: 'Error interno del servidor' });
+};
+
+const listarUsuarios = async (req, res) => {
+  try {
+    const usuarios = await usuarioService.listarUsuarios();
+    return res.json(usuarios);
+  } catch (error) {
+    return handleError(error, res, 'listar usuarios');
+  }
+};
+
+const actualizarUsuario = async (req, res) => {
+  try {
+    const usuario = await usuarioService.actualizarUsuario(req.params.id, req.body);
+    return res.json({
+      mensaje: 'Usuario actualizado',
+      usuario,
+    });
+  } catch (error) {
+    return handleError(error, res, 'actualizar usuario');
+  }
+};
+
+const eliminarUsuario = async (req, res) => {
+  try {
+    const usuario = await usuarioService.eliminarUsuario(req.params.id);
+    return res.json({
+      mensaje: 'Usuario desactivado correctamente',
+      usuario,
+    });
+  } catch (error) {
+    return handleError(error, res, 'desactivar usuario');
+  }
+};
+
+module.exports = {
+  listarUsuarios,
+  actualizarUsuario,
+  eliminarUsuario,
+};

@@ -52,17 +52,30 @@ El backend está organizado bajo una arquitectura en capas (**Model - Repository
 ```
 sonidovivo-backend/
 ├── src/
-│   ├── config/          # Conexión a PostgreSQL y configuración de Swagger
-│   ├── model/           # Model: definición de entidades y estructuras
-│   ├── repository/      # Repository: métodos a consultas SQL
-│   ├── service/         # Service: lógica de negocio
-│   ├── controller/      # Controller: manejo de peticiones, rutas y códigos de estado HTTP
-│   ├── routes/          # Definición de endpoints versionados (/api/v1/...) y Swagger
-│   └── app.js           # Punto de entrada principal del servidor Express
-├── database.sql         # Script de creación de tablas y roles en PostgreSQL
+│   ├── config/          # Conexión a PostgreSQL
+│   ├── model/           # Forma y filtrado de los datos de usuario
+│   ├── repository/      # Consultas SQL para autenticación y usuarios
+│   ├── service/         # Reglas y flujos de negocio
+│   ├── controller/      # Traducción entre HTTP y servicios
+│   ├── routes/          # Endpoints de autenticación y usuarios
+│   └── app.js           # Configuración de Express y montaje de rutas
+├── server.js            # Carga de configuración e inicio del servidor
 ├── package.json         # Dependencias y configuración del proyecto
 └── README.md            # Documentación del proyecto
 ```
+
+Las rutas no acceden directamente a la base de datos: los controladores delegan en servicios, los servicios coordinan la lógica y los repositorios ejecutan SQL. El model de usuario limita los campos que se devuelven en las respuestas.
+
+## Estado de Avance
+
+| Operación | Estado | Detalle |
+| :--- | :--- | :--- |
+| **Tabla de usuarios** | Listo | Tablas `roles` (`Administrador`, `Cliente`) y `usuarios` creadas en PostgreSQL con persistencia real y contraseñas encriptadas con `bcryptjs`. |
+| **Inicio de sesión** | Listo | Endpoint `POST /api/v1/auth/login` operativo. Verifica hash, emite token JWT con vigencia y devuelve error genérico ante credenciales inválidas. |
+| **Registro (crear usuario)** | Listo | Endpoint `POST /api/v1/auth/register` operativo y probado. El servidor asigna el rol inicial `Cliente`. |
+| **Modificar usuario** | En avance | Endpoint `PUT /api/v1/usuarios/:id`.|
+| **Listar usuarios** | En avance | Endpoint `GET /api/v1/usuarios`. |
+| **Eliminar o desactivar usuario** | En avance | Endpoint `DELETE /api/v1/usuarios/:id`. |
 
 ## Material Complementario
 - [Drive | Sonido Vivo](https://drive.google.com/drive/folders/12_GrU2BjxDYlcv_tYToIAlKlEODdBjeE?usp=drive_link)
