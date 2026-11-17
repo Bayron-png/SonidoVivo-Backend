@@ -9,7 +9,7 @@ const pool = new Pool({
 });
 
 pool.query('SELECT NOW()')
-  .then(() => console.log('Conexión exitosa a PostgreSQL'))
+  .then(() => console.log('\u3291 Conexión exitosa a PostgreSQL \u3291'))
   .catch((err) => console.error('Error al conectar a PostgreSQL:', err.message));
 
 module.exports = pool;
