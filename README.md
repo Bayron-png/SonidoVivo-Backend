@@ -32,6 +32,18 @@ Se optó por **PostgreSQL** como motor de base de datos relacional
 ### **Seguridad y Autenticación:** JSON Web Tokens ![JWT](https://img.shields.io/badge/JWT-000000?style=flat&logo=jsonwebtokens&logoColor=white)
 Emisión de tokens firmados con tiempo de expiración para autenticar sesiones sin estado (*stateless*).
 
+Las rutas `GET`, `PUT` y `DELETE /api/v1/usuarios` requieren un token JWT enviado
+como `Authorization: Bearer <token>` y el rol `Administrador`. Sin token se
+responde `401`; con un rol distinto, `403`. Configure `JWT_SECRET` para firmar y
+verificar los tokens.
+
+CORS solo permite el origen indicado en `FRONTEND_URL`. En desarrollo, si no se
+define, se permite `http://localhost:5173`; en despliegue configure esa variable
+con la URL de origen del frontend.
+
+El registro valida el formato del correo y requiere una contraseña de al menos
+8 caracteres, con un máximo de 72 bytes para evitar el truncamiento de bcrypt.
+
 ### **Infraestructura y Despliegue:** Amazon EC2 ![Amazon EC2](https://img.shields.io/badge/AWS-FF9900?style=flat&logo=amazonec2&logoColor=white)
 Se eligió desplegar el backend en una instancia **Amazon EC2** en lugar de una arquitectura *serverless* como **AWS Lambda** por las siguientes razones:
 - **Servidor Continuo y Sin Arranques en Frío (*Cold Starts*):** A diferencia de Lambda, donde las funciones se detienen tras periodos de inactividad provocando latencia inicial en las primeras peticiones, EC2 mantiene el proceso de Node.js/Express activo 24/7, ofreciendo tiempos de respuesta inmediatos al navegar por el catálogo.

@@ -5,7 +5,10 @@ const authRoutes = require('./routes/auth.routes');
 const usuarioRoutes = require('./routes/usuario.routes');
 
 const app = express();
-app.use(cors());
+// Solo acepta peticiones del frontend
+app.use(cors({
+  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+}));
 app.use(express.json());
 
 app.use('/api/v1/auth', authRoutes);

@@ -5,7 +5,9 @@ const {
   actualizarUsuario,
   eliminarUsuario,
 } = require('../controller/usuario.controller');
+const { verificarTokenAdmin } = require('../middleware/auth.middleware');
 
+router.use(verificarTokenAdmin);
 router.get('/', listarUsuarios);
 router.put('/:id', actualizarUsuario);
 router.delete('/:id', eliminarUsuario);
