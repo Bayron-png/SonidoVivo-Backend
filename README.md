@@ -59,7 +59,14 @@ Documentación interactiva autogenerada en las rutas. Permite inspeccionar los e
 > El proyecto usa **PostgreSQL**, no MySQL. 
 
 ### Requisitos
-- [Node.js](https://nodejs.org/) instalado.
+- [Node.js](https://nodejs.org/) instalado. En Windows y macOS se puede descargar el instalador desde la página oficial. En Ubuntu/Debian se puede instalar con:
+
+  ```bash
+  sudo apt update
+  sudo apt install nodejs npm
+  node --version
+  npm --version
+  ```
 - [PostgreSQL](https://www.postgresql.org/download/) instalado y con el servicio iniciado. Se puede administrar la base de datos desde `psql` o desde pgAdmin.
 
 ### Pasos
