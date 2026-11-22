@@ -1,5 +1,7 @@
-const { Pool } = require('pg');
+// Pool permite crear conexiones a PostgreSQL
+const { Pool } = require('pg'); // Importar Pool del paquete "pg"
 
+// Crear instancia quea administra la DB
 const pool = new Pool({
   host: process.env.DB_HOST,
   port: process.env.DB_PORT,

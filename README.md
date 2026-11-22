@@ -54,6 +54,86 @@ Se eligió desplegar el backend en una instancia **Amazon EC2** en lugar de una 
 ### **Documentación API:** Swagger [![Swagger](https://img.shields.io/badge/Swagger-API_Docs-85EA2D?style=flat&logo=swagger&logoColor=black)](http://localhost:3000/api-docs)
 Documentación interactiva autogenerada en las rutas. Permite inspeccionar los esquemas de entrada/salida, códigos de respuesta HTTP (`200`, `201`, `400`, `401`, `409`) y probar los endpoints protegidos directamente desde el navegador.
 
+## Instalación y ejecución local
+
+> El proyecto usa **PostgreSQL**, no MySQL. 
+
+### Requisitos
+- [Node.js](https://nodejs.org/) instalado.
+- [PostgreSQL](https://www.postgresql.org/download/) instalado y con el servicio iniciado. Se puede administrar la base de datos desde `psql` o desde pgAdmin.
+
+### Pasos
+
+1. Clona el repositorio y entra a la carpeta:
+
+   ```bash
+   git clone https://github.com/Bayron-png/SonidoVivo-Backend.git
+   cd SonidoVivo-Backend
+   ```
+
+2. Instalar las dependencias:
+
+   ```bash
+   npm install
+   ```
+
+3. Instalar PostgreSQL (solo si no está instalado)
+```
+sudo apt update
+sudo apt install postgresql postgresql-contrib
+sudo systemctl start postgresql
+sudo systemctl enable postgresql
+psql --version
+sudo -u postgres psql
+```
+
+4. Crear un usuario y una base de datos en PostgreSQL. Desde una terminal, con `psql` disponible:
+
+   En la consola de PostgreSQL, ejecutar (reemplazar la contraseña por una propia) y luego salir con `\q`:
+
+   ```sql
+   CREATE USER sonidovivo_user WITH PASSWORD 'elegir_una_clave_local';
+   CREATE DATABASE sonidovivo OWNER sonidovivo_user;
+   ```
+
+   También se puede crear el usuario y la base de datos desde pgAdmin. Si PostgreSQL está en otro puerto o servidor, usar esos datos en los pasos siguientes.
+
+4. Desde la carpeta del proyecto, crea las tablas y roles ejecutando el script:
+
+   ```bash
+   psql -h localhost -p 5432 -U sonidovivo_user -d sonidovivo -f src/database/CreacionTablas-SonidoVivo.sql
+   ```
+
+   Ingresar la contraseña que se definió para `sonidovivo_user`. Como alternativa, abrir `src/database/CreacionTablas-SonidoVivo.sql` en el Query Tool de pgAdmin, conectado a la base `sonidovivo`, y ejecutar el script.
+
+5. Crea un archivo `.env` en la raíz del proyecto con la configuración del equipo:
+
+   ```env
+   PORT=3000
+   DB_HOST=localhost
+   DB_PORT=5432
+   DB_USER=sonidovivo_user
+   DB_PASSWORD=contraseña_del_usuario_creado
+   DB_NAME=sonidovivo
+   JWT_SECRET=reemplaza_por_un_secreto_aleatorio_largo
+   JWT_EXPIRES_IN=2h
+   FRONTEND_URL=http://localhost:5173
+   ```
+**Generar JWT_SECRET**
+```env
+node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
+```
+
+   `DB_PASSWORD` debe coincidir con la contraseña creada para el usuario de PostgreSQL. No compartir ni subir el archivo `.env` al repositorio.
+
+6. Iniciar el backend:
+
+   ```bash
+   npm start
+   ```
+
+   El servidor queda disponible en `http://localhost:3000`. En la consola debe aparecer el mensaje de conexión exitosa a PostgreSQL. Si la conexión falla, comprobar que el servicio de PostgreSQL esté iniciado y que los valores de `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD` y `DB_NAME` sean correctos.
+
 ## Diagrama entidad Relación
 - [Diagrama](https://drive.google.com/file/d/166MTdBqxLYp9Ur9AyB8VAm6_xn5V-Bmw/view?usp=drive_link)
 
@@ -85,9 +165,9 @@ Las rutas no acceden directamente a la base de datos: los controladores delegan 
 | **Tabla de usuarios** | Listo | Tablas `roles` (`Administrador`, `Cliente`) y `usuarios` creadas en PostgreSQL con persistencia real y contraseñas encriptadas con `bcryptjs`. |
 | **Inicio de sesión** | Listo | Endpoint `POST /api/v1/auth/login` operativo. Verifica hash, emite token JWT con vigencia y devuelve error genérico ante credenciales inválidas. |
 | **Registro (crear usuario)** | Listo | Endpoint `POST /api/v1/auth/register` operativo y probado. El servidor asigna el rol inicial `Cliente`. |
-| **Modificar usuario** | En avance | Endpoint `PUT /api/v1/usuarios/:id`.|
-| **Listar usuarios** | En avance | Endpoint `GET /api/v1/usuarios`. |
-| **Eliminar o desactivar usuario** | En avance | Endpoint `DELETE /api/v1/usuarios/:id`. |
+| **Modificar usuario** | Listo | Endpoint `PUT /api/v1/usuarios/:id` operativo; permite actualizar nombre, correo y rol. Requiere token JWT de administrador. |
+| **Listar usuarios** | Listo | Endpoint `GET /api/v1/usuarios` operativo. Requiere token JWT de administrador. |
+| **Eliminar o desactivar usuario** | Listo | Endpoint `DELETE /api/v1/usuarios/:id` operativo; desactiva al usuario sin borrar sus datos. Requiere token JWT de administrador. |
 
 ## Material Complementario
 - [Drive | Sonido Vivo](https://drive.google.com/drive/folders/12_GrU2BjxDYlcv_tYToIAlKlEODdBjeE?usp=drive_link)
