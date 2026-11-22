@@ -56,7 +56,7 @@ Documentación interactiva autogenerada en las rutas. Permite inspeccionar los e
 
 ## Instalación y ejecución local
 
-> El proyecto usa **PostgreSQL**, no MySQL. 
+> El proyecto usa **PostgreSQL**.
 
 ### Requisitos
 - [Node.js](https://nodejs.org/) instalado. En Windows y macOS se puede descargar el instalador desde la página oficial. En Ubuntu/Debian se puede instalar con:
