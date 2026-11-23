@@ -22,6 +22,14 @@ const parametroId = {
   schema: { type: 'integer', minimum: 1, example: 2 },
 };
 
+const parametroProductoId = {
+  name: 'id',
+  in: 'path',
+  required: true,
+  description: 'Id del producto',
+  schema: { type: 'string', example: 'GTR-001' },
+};
+
 const seguridad = [{ bearerAuth: [] }];
 
 const respuestaUsuario = (mensaje) => ({
@@ -33,6 +41,21 @@ const respuestaUsuario = (mensaje) => ({
         properties: {
           mensaje: { type: 'string', example: mensaje },
           usuario: { $ref: '#/components/schemas/Usuario' },
+        },
+      },
+    },
+  },
+});
+
+const respuestaProducto = (mensaje) => ({
+  description: mensaje,
+  content: {
+    'application/json': {
+      schema: {
+        type: 'object',
+        properties: {
+          mensaje: { type: 'string', example: mensaje },
+          producto: { $ref: '#/components/schemas/Producto' },
         },
       },
     },
@@ -54,6 +77,7 @@ const swaggerSpec = {
   tags: [
     { name: 'Autenticación', description: 'Registro e inicio de sesión (rutas públicas)' },
     { name: 'Usuarios', description: 'Gestión de usuarios (solo Administrador)' },
+    { name: 'Catálogo', description: 'Consulta pública y gestión de productos (gestión solo Administrador)' },
   ],
   paths: {
     '/auth/register': {
@@ -146,6 +170,104 @@ const swaggerSpec = {
         },
       },
     },
+    '/catalogo': {
+      get: {
+        tags: ['Catálogo'],
+        summary: 'Listar productos activos',
+        responses: {
+          200: {
+            description: 'Lista de productos activos',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'array',
+                  items: { $ref: '#/components/schemas/Producto' },
+                },
+              },
+            },
+          },
+          500: respuestasProtegidas[500],
+        },
+      },
+      post: {
+        tags: ['Catálogo'],
+        summary: 'Crear un producto',
+        description: 'Solo el Administrador puede crear productos.',
+        security: seguridad,
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: { $ref: '#/components/schemas/CrearProductoRequest' },
+            },
+          },
+        },
+        responses: {
+          201: respuestaProducto('Producto creado exitosamente'),
+          400: respuestaError('Datos inválidos o faltantes', 'stock y precio deben ser enteros mayores o iguales a cero'),
+          401: respuestasProtegidas[401],
+          403: respuestasProtegidas[403],
+          409: respuestaError('Ya existe un producto con ese id', 'Ya existe un producto con ese id'),
+          500: respuestasProtegidas[500],
+        },
+      },
+    },
+    '/catalogo/{id}': {
+      get: {
+        tags: ['Catálogo'],
+        summary: 'Obtener un producto',
+        parameters: [parametroProductoId],
+        responses: {
+          200: {
+            description: 'Producto encontrado',
+            content: {
+              'application/json': {
+                schema: { $ref: '#/components/schemas/Producto' },
+              },
+            },
+          },
+          404: respuestaError('El producto no existe o está inactivo', 'Producto no encontrado'),
+          500: respuestasProtegidas[500],
+        },
+      },
+      put: {
+        tags: ['Catálogo'],
+        summary: 'Actualizar un producto',
+        description: 'Solo el Administrador puede actualizar productos.',
+        security: seguridad,
+        parameters: [parametroProductoId],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: { $ref: '#/components/schemas/ActualizarProductoRequest' },
+            },
+          },
+        },
+        responses: {
+          200: respuestaProducto('Producto actualizado'),
+          400: respuestaError('Datos inválidos o faltantes', 'Debe enviar al menos un campo para actualizar'),
+          401: respuestasProtegidas[401],
+          403: respuestasProtegidas[403],
+          404: respuestaError('El producto no existe', 'Producto no encontrado'),
+          500: respuestasProtegidas[500],
+        },
+      },
+      delete: {
+        tags: ['Catálogo'],
+        summary: 'Desactivar un producto',
+        description: 'Eliminación lógica: marca el producto como inactivo. Solo el Administrador puede usar esta ruta.',
+        security: seguridad,
+        parameters: [parametroProductoId],
+        responses: {
+          200: respuestaProducto('Producto desactivado correctamente'),
+          401: respuestasProtegidas[401],
+          403: respuestasProtegidas[403],
+          404: respuestaError('El producto no existe', 'Producto no encontrado'),
+          500: respuestasProtegidas[500],
+        },
+      },
+    },
   },
   components: {
     securitySchemes: {
@@ -176,6 +298,64 @@ const swaggerSpec = {
           nombre: { type: 'string', example: 'Juan P. Soto' },
           correo: { type: 'string', format: 'email', example: 'juan.soto@correo.cl' },
           rol_id: { type: 'integer', example: 3 },
+        },
+      },
+      CrearProductoRequest: {
+        type: 'object',
+        required: [
+          'id',
+          'nombre',
+          'categoria',
+          'categoriaSlug',
+          'marca',
+          'modelo',
+          'stock',
+          'precio',
+          'imagen',
+        ],
+        properties: {
+          id: { type: 'string', example: 'GTR-001' },
+          nombre: { type: 'string', example: 'Guitarra eléctrica' },
+          categoria: { type: 'string', example: 'Guitarras' },
+          categoriaSlug: { type: 'string', example: 'guitarras' },
+          marca: { type: 'string', example: 'Fender' },
+          modelo: { type: 'string', example: 'Player Stratocaster' },
+          stock: { type: 'integer', minimum: 0, example: 10 },
+          precio: { type: 'integer', minimum: 0, example: 799990 },
+          descripcion: { type: 'string', example: 'Guitarra eléctrica de seis cuerdas' },
+          imagen: { type: 'string', example: 'https://sonidovivo.cl/images/gtr-001.jpg' },
+        },
+      },
+      ActualizarProductoRequest: {
+        type: 'object',
+        minProperties: 1,
+        properties: {
+          nombre: { type: 'string', example: 'Guitarra eléctrica' },
+          categoria: { type: 'string', example: 'Guitarras' },
+          categoriaSlug: { type: 'string', example: 'guitarras' },
+          marca: { type: 'string', example: 'Fender' },
+          modelo: { type: 'string', example: 'Player Stratocaster' },
+          stock: { type: 'integer', minimum: 0, example: 10 },
+          precio: { type: 'integer', minimum: 0, example: 799990 },
+          descripcion: { type: 'string', example: 'Guitarra eléctrica de seis cuerdas' },
+          imagen: { type: 'string', example: 'https://sonidovivo.cl/images/gtr-001.jpg' },
+          activo: { type: 'boolean', example: true },
+        },
+      },
+      Producto: {
+        type: 'object',
+        properties: {
+          id: { type: 'string', example: 'GTR-001' },
+          nombre: { type: 'string', example: 'Guitarra eléctrica' },
+          categoria: { type: 'string', example: 'Guitarras' },
+          categoria_slug: { type: 'string', example: 'guitarras' },
+          marca: { type: 'string', example: 'Fender' },
+          modelo: { type: 'string', example: 'Player Stratocaster' },
+          stock: { type: 'integer', example: 10 },
+          precio: { type: 'integer', example: 799990 },
+          descripcion: { type: 'string', example: 'Guitarra eléctrica de seis cuerdas' },
+          imagen: { type: 'string', example: 'https://sonidovivo.cl/images/gtr-001.jpg' },
+          activo: { type: 'boolean', example: true },
         },
       },
       Usuario: {
