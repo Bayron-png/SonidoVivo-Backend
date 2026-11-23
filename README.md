@@ -152,11 +152,13 @@ El backend está organizado bajo una arquitectura en capas (**Model - Repository
 sonidovivo-backend/
 ├── src/
 │   ├── config/          # Conexión a PostgreSQL
+│   ├── controller/      # Traducción entre HTTP y servicios
+│   ├── database/        # Script para cargar las tablas de la base de datos
+│   ├── middleware/      # Validación de JWT y autorización por rol administrador
 │   ├── model/           # Forma y filtrado de los datos de usuario
 │   ├── repository/      # Consultas SQL para autenticación y usuarios
-│   ├── service/         # Reglas y flujos de negocio
-│   ├── controller/      # Traducción entre HTTP y servicios
 │   ├── routes/          # Endpoints de autenticación y usuarios
+│   ├── service/         # Reglas y flujos de negocio
 │   └── app.js           # Configuración de Express y montaje de rutas
 ├── server.js            # Carga de configuración e inicio del servidor
 ├── package.json         # Dependencias y configuración del proyecto
