@@ -29,8 +29,13 @@ INSERT INTO usuarios (nombre, correo, password_hash, rol_id)
 SELECT
     'Administrador',
     'admin@sonidovivo.local',
-    '$2b$10$RKNfzbeoD4x9wswI/2zSr.RdzBJfC/iX698oj4qia4CXks96ne8Lu',
+    '$2b$10$uuYiefsHFOOlaiMpYCBjFejQeKbTAB3j8IY.e4MzehjiBHPlGq4D6',
     roles.id
 FROM roles
 WHERE roles.nombre = 'Administrador'
-ON CONFLICT (correo) DO NOTHING;
+ON CONFLICT (correo) DO UPDATE
+SET
+    nombre = EXCLUDED.nombre,
+    password_hash = EXCLUDED.password_hash,
+    rol_id = EXCLUDED.rol_id,
+    activo = TRUE;
