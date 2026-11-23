@@ -185,7 +185,7 @@ sonidovivo-backend/
 │   ├── middleware/      # Validación de JWT y autorización por rol administrador
 │   ├── model/           # Forma y filtrado de los datos de usuario
 │   ├── repository/      # Consultas SQL para autenticación y usuarios
-│   ├── routes/          # Endpoints de autenticación y usuarios
+│   ├── routes/          # Endpoints de autenticación, usuarios y catálogo
 │   ├── service/         # Reglas y flujos de negocio
 │   └── app.js           # Configuración de Express y montaje de rutas
 ├── server.js            # Carga de configuración e inicio del servidor
@@ -205,6 +205,59 @@ Las rutas no acceden directamente a la base de datos: los controladores delegan 
 | **Modificar usuario** | Listo | Endpoint `PUT /api/v1/usuarios/:id` operativo; permite actualizar nombre, correo y rol. Requiere token JWT de administrador. |
 | **Listar usuarios** | Listo | Endpoint `GET /api/v1/usuarios` operativo. Requiere token JWT de administrador. |
 | **Eliminar o desactivar usuario** | Listo | Endpoint `DELETE /api/v1/usuarios/:id` operativo; desactiva al usuario sin borrar sus datos. Requiere token JWT de administrador. |
+| **Listar productos** | Listo | Endpoint público `GET /api/v1/catalogo`. Devuelve los productos activos almacenados en PostgreSQL. |
+| **Consultar producto** | Listo | Endpoint público `GET /api/v1/catalogo/:id`. Busca un producto por su código, como `GA001`. |
+| **Crear producto** | Listo | Endpoint `POST /api/v1/catalogo`. Requiere token JWT de administrador. |
+| **Modificar producto** | Listo | Endpoint `PUT /api/v1/catalogo/:id`. Permite modificar los campos enviados y requiere token JWT de administrador. |
+| **Eliminar o desactivar producto** | Listo | Endpoint `DELETE /api/v1/catalogo/:id`. Desactiva el producto sin eliminarlo y requiere token JWT de administrador. |
+
+### Catálogo de productos
+
+El script de base de datos crea la tabla `productos` y carga 51 productos iniciales. Las rutas del catálogo son públicas y no requieren JWT:
+
+```text
+GET /api/v1/catalogo
+GET /api/v1/catalogo/GA001
+```
+
+`GET /api/v1/catalogo` devuelve todos los productos activos. `GET /api/v1/catalogo/:id` devuelve un producto por su código.
+
+Crear, modificar y desactivar productos requiere iniciar sesión como administrador y enviar el token JWT:
+
+```text
+POST /api/v1/catalogo
+PUT /api/v1/catalogo/:id
+DELETE /api/v1/catalogo/:id
+Authorization: Bearer <token>
+```
+
+Ejemplo para crear un producto:
+
+```json
+{
+  "id": "GA006",
+  "nombre": "Guitarra de prueba",
+  "categoria": "Guitarras Acústicas",
+  "categoriaSlug": "guitarras-acusticas",
+  "marca": "Yamaha",
+  "modelo": "Modelo de prueba",
+  "stock": 5,
+  "precio": 99990,
+  "descripcion": "Producto agregado para pruebas.",
+  "imagen": "/productos/guitarras-acusticas/ga006.png"
+}
+```
+
+Para modificar un producto se puede enviar solo los campos que deben cambiar:
+
+```json
+{
+  "stock": 10,
+  "precio": 89990
+}
+```
+
+`DELETE /api/v1/catalogo/:id` realiza una desactivación lógica: establece `activo = false` sin eliminar el registro.
 
 ## Material Complementario
 - [Drive | Sonido Vivo](https://drive.google.com/drive/folders/12_GrU2BjxDYlcv_tYToIAlKlEODdBjeE?usp=drive_link)

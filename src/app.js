@@ -5,6 +5,7 @@ const swaggerUi = require('swagger-ui-express');
 const swaggerSpec = require('./config/swagger');
 const authRoutes = require('./routes/auth.routes');
 const usuarioRoutes = require('./routes/usuario.routes');
+const catalogoRoutes = require('./routes/catalogo.routes');
 
 const app = express();
 // Solo acepta peticiones del frontend
@@ -21,6 +22,7 @@ app.get('/api-docs.json', (req, res) => res.json(swaggerSpec));
 
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/usuarios', usuarioRoutes);
+app.use('/api/v1/catalogo', catalogoRoutes);
 
 app.use((req, res) => res.status(404).json({ error: 'Ruta no encontrada' }));
 
