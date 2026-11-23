@@ -185,7 +185,7 @@ sonidovivo-backend/
 │   ├── middleware/      # Validación de JWT y autorización por rol administrador
 │   ├── model/           # Forma y filtrado de los datos de usuario
 │   ├── repository/      # Consultas SQL para autenticación y usuarios
-│   ├── routes/          # Endpoints de autenticación y usuarios
+│   ├── routes/          # Endpoints de autenticación, usuarios y catálogo
 │   ├── service/         # Reglas y flujos de negocio
 │   └── app.js           # Configuración de Express y montaje de rutas
 ├── server.js            # Carga de configuración e inicio del servidor
@@ -205,6 +205,18 @@ Las rutas no acceden directamente a la base de datos: los controladores delegan 
 | **Modificar usuario** | Listo | Endpoint `PUT /api/v1/usuarios/:id` operativo; permite actualizar nombre, correo y rol. Requiere token JWT de administrador. |
 | **Listar usuarios** | Listo | Endpoint `GET /api/v1/usuarios` operativo. Requiere token JWT de administrador. |
 | **Eliminar o desactivar usuario** | Listo | Endpoint `DELETE /api/v1/usuarios/:id` operativo; desactiva al usuario sin borrar sus datos. Requiere token JWT de administrador. |
+| **Catálogo de productos** | Listo | Tabla `productos` con 51 registros iniciales. Endpoints públicos `GET /api/v1/catalogo` y `GET /api/v1/catalogo/:id`. |
+
+### Catálogo de productos
+
+El script de base de datos crea la tabla `productos` y carga 51 productos iniciales. Las rutas del catálogo son públicas y no requieren JWT:
+
+```text
+GET /api/v1/catalogo
+GET /api/v1/catalogo/GA001
+```
+
+`GET /api/v1/catalogo` devuelve todos los productos activos. `GET /api/v1/catalogo/:id` devuelve un producto por su código.
 
 ## Material Complementario
 - [Drive | Sonido Vivo](https://drive.google.com/drive/folders/12_GrU2BjxDYlcv_tYToIAlKlEODdBjeE?usp=drive_link)
