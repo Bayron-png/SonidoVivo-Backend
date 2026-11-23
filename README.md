@@ -21,7 +21,7 @@ Este backend implementa funcionalidades como:
 Se optó por usar `Node.js` y `Express` debido a los siguientes motivos:
 - **Cohesión Fullstack:** Al utilizar React en el frontend, mantener JavaScript en el servidor unifica las tecnologías del equipo, simplificando el manejo de objetos JSON entre cliente y API.
 - **Endpoints:** Express permite modularizar rutas mediante `express.Router()`, separando cada recurso en su propio archivo de forma ordenada.
-- **Compatabilidad con Swagger:** Express integra de forma nativa `swagger-ui-express` y `swagger-jsdoc`, permitiendo levantar documentacion interactiva en /api-docs.
+- **Compatabilidad con Swagger:** Express integra de forma nativa `swagger-ui-express` (con una especificación OpenAPI 3 en `src/config/swagger.js`), permitiendo levantar documentacion interactiva en /api-docs.
 **Base de Datos**
 
 ### **Base de datos:** PostgreSQL ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=flat&logo=postgresql&logoColor=white)
@@ -51,8 +51,34 @@ Se eligió desplegar el backend en una instancia **Amazon EC2** en lugar de una 
 - **Control Total del Entorno y Coexistencia con PostgreSQL:** Brinda acceso directo al sistema operativo Linux para administrar puertos (*Security Groups*), variables de entorno y alojar el motor de base de datos PostgreSQL en la misma infraestructura sin costos ni configuraciones adicionales de VPC complejas.
 
 
-### **Documentación API:** Swagger [![Swagger](https://img.shields.io/badge/Swagger-API_Docs-85EA2D?style=flat&logo=swagger&logoColor=black)](http://localhost:3000/api-docs)
-Documentación interactiva autogenerada en las rutas. Permite inspeccionar los esquemas de entrada/salida, códigos de respuesta HTTP (`200`, `201`, `400`, `401`, `409`) y probar los endpoints protegidos directamente desde el navegador.
+### **Documentación API:** Swagger
+Documentación interactiva con **Swagger UI** (OpenAPI 3), definida en `src/config/swagger.js`. Permite ver los esquemas de entrada y salida, los códigos HTTP de cada endpoint (`200`, `201`, `400`, `401`, `403`, `404`) y probar las rutas desde el navegador.
+
+| Entorno | Dirección |
+| :--- | :--- |
+| Desplegado (EC2) | `http://98.87.152.213:3000/api-docs` |
+| Local | `http://localhost:3000/api-docs` |
+
+La especificación en JSON está disponible en `/api-docs.json`.
+
+**Cómo probar rutas protegidas:**
+1. Ejecutar `POST /auth/register` para crear un usuario (se crea con rol `Cliente`).
+2. Ejecutar `POST /auth/login` con ese correo y contraseña, y copiar el `token` de la respuesta.
+3. Las rutas de `/usuarios` exigen rol `Administrador`. Por seguridad el registro siempre crea `Cliente`, así que el primer administrador se asciende desde la base de datos:
+   `UPDATE usuarios SET rol_id = 1 WHERE correo = 'tu@correo.cl';`
+   Luego hay que volver a hacer login para obtener un token nuevo.
+4. Pulsar **Authorize**, pegar el token (sin la palabra `Bearer`) y cerrar.
+5. Probar `GET /usuarios`, `PUT /usuarios/{id}` y `DELETE /usuarios/{id}`. Con otro rol responden `403` y sin token `401`.
+
+**Endpoints documentados:**
+
+| Método | Ruta | Acceso |
+| :--- | :--- | :--- |
+| POST | `/api/v1/auth/register` | Público |
+| POST | `/api/v1/auth/login` | Público |
+| GET | `/api/v1/usuarios` | Administrador |
+| PUT | `/api/v1/usuarios/:id` | Administrador |
+| DELETE | `/api/v1/usuarios/:id` | Administrador |
 
 ## Instalación y ejecución local
 
