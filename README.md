@@ -64,11 +64,11 @@ La especificación en JSON está disponible en `/api-docs.json`.
 **Cómo probar rutas protegidas:**
 1. Ejecutar `POST /auth/register` para crear un usuario (se crea con rol `Cliente`).
 2. Ejecutar `POST /auth/login` con ese correo y contraseña, y copiar el `token` de la respuesta.
-3. Las rutas de `/usuarios` exigen rol `Administrador`. Por seguridad el registro siempre crea `Cliente`, así que el primer administrador se asciende desde la base de datos:
+3. Las rutas de gestión de `/usuarios` y las operaciones `POST`, `PUT` y `DELETE` de `/catalogo` exigen rol `Administrador`. Por seguridad el registro siempre crea `Cliente`, así que el primer administrador se asciende desde la base de datos:
    `UPDATE usuarios SET rol_id = 1 WHERE correo = 'tu@correo.cl';`
    Luego hay que volver a hacer login para obtener un token nuevo.
 4. Pulsar **Authorize**, pegar el token (sin la palabra `Bearer`) y cerrar.
-5. Probar `GET /usuarios`, `PUT /usuarios/{id}` y `DELETE /usuarios/{id}`. Con otro rol responden `403` y sin token `401`.
+5. Probar `GET /usuarios`, `PUT /usuarios/{id}`, `DELETE /usuarios/{id}` y las operaciones protegidas del catálogo. `GET /catalogo` y `GET /catalogo/{id}` son públicas. Las rutas protegidas responden `403` con un rol distinto y `401` sin token.
 
 **Endpoints documentados:**
 
@@ -79,6 +79,11 @@ La especificación en JSON está disponible en `/api-docs.json`.
 | GET | `/api/v1/usuarios` | Administrador |
 | PUT | `/api/v1/usuarios/:id` | Administrador |
 | DELETE | `/api/v1/usuarios/:id` | Administrador |
+| GET | `/api/v1/catalogo` | Público |
+| GET | `/api/v1/catalogo/:id` | Público |
+| POST | `/api/v1/catalogo` | Administrador |
+| PUT | `/api/v1/catalogo/:id` | Administrador |
+| DELETE | `/api/v1/catalogo/:id` | Administrador |
 
 ## Instalación y ejecución local
 
@@ -131,7 +136,7 @@ sudo -u postgres psql
 
    También se puede crear el usuario y la base de datos desde pgAdmin. Si PostgreSQL está en otro puerto o servidor, usar esos datos en los pasos siguientes.
 
-4. Desde la carpeta del proyecto, crea las tablas y roles ejecutando el script:
+4. Desde la carpeta del proyecto, crea las tablas y roles ejecutando el script. Asegúrate de ejecutarlo en la misma base de datos configurada en `DB_NAME`; el script también crea `productos` y carga el catálogo inicial:
 
    ```bash
    psql -h localhost -p 5432 -U sonidovivo_user -d sonidovivo -f src/database/CreacionTablas-SonidoVivo.sql
