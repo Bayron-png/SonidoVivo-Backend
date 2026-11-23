@@ -20,3 +20,17 @@ CREATE TABLE IF NOT EXISTS usuarios (
     activo BOOLEAN NOT NULL DEFAULT TRUE,
     creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- 4. Usuario administrador de pruebas
+-- Credenciales:
+--   Correo: admin@sonidovivo.local
+--   Contraseña: Admin123!
+INSERT INTO usuarios (nombre, correo, password_hash, rol_id)
+SELECT
+    'Administrador',
+    'admin@sonidovivo.local',
+    '$2b$10$RKNfzbeoD4x9wswI/2zSr.RdzBJfC/iX698oj4qia4CXks96ne8Lu',
+    roles.id
+FROM roles
+WHERE roles.nombre = 'Administrador'
+ON CONFLICT (correo) DO NOTHING;

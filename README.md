@@ -139,6 +139,34 @@ node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
    npm start
    ```
 
+   El servidor queda disponible en `http://localhost:3000`.
+
+### Usuario administrador de pruebas
+
+Al ejecutar `src/database/CreacionTablas-SonidoVivo.sql` se crea el siguiente usuario:
+
+```text
+Correo: admin@sonidovivo.local
+Contraseña: Admin123!
+```
+
+El usuario puede iniciar sesión con `POST /api/v1/auth/login`:
+
+```json
+{
+  "correo": "admin@sonidovivo.local",
+  "password": "Admin123!"
+}
+```
+
+La respuesta incluye un token JWT. Para acceder a las rutas protegidas de usuarios, enviarlo en el encabezado:
+
+```text
+Authorization: Bearer <token>
+```
+
+Estas credenciales son exclusivas para desarrollo y pruebas locales y se recomienda cambiarlas al final del script en ```src/database/CreacionTablas-SonidoVivo.sql```.
+
    El servidor queda disponible en `http://localhost:3000`. En la consola debe aparecer el mensaje de conexión exitosa a PostgreSQL. Si la conexión falla, comprobar que el servicio de PostgreSQL esté iniciado y que los valores de `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD` y `DB_NAME` sean correctos.
 
 ## Diagrama entidad Relación
