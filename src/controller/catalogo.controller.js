@@ -1,5 +1,13 @@
 const catalogoService = require('../service/catalogo.service');
 
+const manejarError = (error, res, operacion) => {
+  if (error.statusCode) {
+    return res.status(error.statusCode).json({ error: error.message });
+  }
+  console.error(`Error al ${operacion}:`, error);
+  return res.status(500).json({ error: 'Error interno del servidor' });
+};
+
 const listarProductos = async (req, res) => {
   try {
     const productos = await catalogoService.listarProductos();
@@ -23,7 +31,49 @@ const obtenerProducto = async (req, res) => {
   }
 };
 
+const crearProducto = async (req, res) => {
+  try {
+    const producto = await catalogoService.crearProducto(req.body);
+    return res.status(201).json({
+      mensaje: 'Producto creado exitosamente',
+      producto,
+    });
+  } catch (error) {
+    return manejarError(error, res, 'crear producto');
+  }
+};
+
+const actualizarProducto = async (req, res) => {
+  try {
+    const producto = await catalogoService.actualizarProducto(
+      req.params.id,
+      req.body
+    );
+    return res.json({
+      mensaje: 'Producto actualizado',
+      producto,
+    });
+  } catch (error) {
+    return manejarError(error, res, 'actualizar producto');
+  }
+};
+
+const desactivarProducto = async (req, res) => {
+  try {
+    const producto = await catalogoService.desactivarProducto(req.params.id);
+    return res.json({
+      mensaje: 'Producto desactivado correctamente',
+      producto,
+    });
+  } catch (error) {
+    return manejarError(error, res, 'desactivar producto');
+  }
+};
+
 module.exports = {
   listarProductos,
   obtenerProducto,
+  crearProducto,
+  actualizarProducto,
+  desactivarProducto,
 };
