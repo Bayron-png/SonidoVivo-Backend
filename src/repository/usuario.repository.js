@@ -31,8 +31,18 @@ const desactivarUsuario = async (id) => {
   return result.rows[0] || null;
 };
 
+const existeRol = async (id) => {
+  const result = await pool.query(
+    'SELECT 1 FROM roles WHERE id = $1',
+    [id]
+  );
+
+  return result.rowCount > 0;
+};
+
 module.exports = {
   listarUsuarios,
   actualizarUsuario,
   desactivarUsuario,
+  existeRol,
 };
