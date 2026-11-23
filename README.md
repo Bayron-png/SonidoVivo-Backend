@@ -71,7 +71,7 @@ Documentación interactiva autogenerada en las rutas. Permite inspeccionar los e
 
 ### Pasos
 
-1. Clona el repositorio y entra a la carpeta:
+1. Clonar el repositorio y entra a la carpeta:
 
    ```bash
    git clone https://github.com/Bayron-png/SonidoVivo-Backend.git
