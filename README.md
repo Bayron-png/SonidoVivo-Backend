@@ -156,13 +156,15 @@ sudo -u postgres psql
    JWT_SECRET=reemplaza_por_un_secreto_aleatorio_largo
    JWT_EXPIRES_IN=2h
    FRONTEND_URL=http://localhost:5173
+   # Opcional: fijar la IPv4 pública si la detección automática no coincide
+   # PUBLIC_IPV4=
    ```
 **Generar JWT_SECRET**
 ```env
 node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
 ```
 
-   `DB_PASSWORD` debe coincidir con la contraseña creada para el usuario de PostgreSQL. No compartir ni subir el archivo `.env` al repositorio.
+   `DB_PASSWORD` debe coincidir con la contraseña creada para el usuario de PostgreSQL. No compartir el archivo `.env`.
 
 6. Iniciar el backend:
 
@@ -170,7 +172,7 @@ node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
    npm start
    ```
 
-   El servidor queda disponible en `http://localhost:3000`.
+   El servidor queda disponible en `http://localhost:3000` y la ip pública que cambia constantemente.
 
 ### Usuario administrador de pruebas
 
