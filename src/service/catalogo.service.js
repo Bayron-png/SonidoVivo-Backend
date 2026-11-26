@@ -115,10 +115,19 @@ const desactivarProducto = async (id) => {
   return producto;
 };
 
+const activarProducto = async (id) => {
+  const producto = await catalogoRepository.activarProducto(id.toUpperCase());
+  if (!producto) {
+    throw new AppError('Producto no encontrado', 404);
+  }
+  return producto;
+};
+
 module.exports = {
   listarProductos,
   obtenerProducto,
   crearProducto,
   actualizarProducto,
   desactivarProducto,
+  activarProducto,
 };

@@ -60,4 +60,19 @@ module.exports = {
       },
     },
   },
+  '/usuarios/{id}/activar': {
+    patch: {
+      tags: ['Usuarios'],
+      summary: 'Activar un usuario',
+      description: 'Reactiva un usuario previamente desactivado. Solo el Administrador puede usar esta ruta.',
+      security: seguridad,
+      parameters: [parametroId],
+      responses: {
+        200: respuestaUsuario('Usuario activado correctamente'),
+        400: respuestaError('Id inválido', 'El ID debe ser un entero positivo'),
+        404: respuestaError('El usuario no existe', 'Usuario no encontrado'),
+        ...respuestasProtegidas,
+      },
+    },
+  },
 };

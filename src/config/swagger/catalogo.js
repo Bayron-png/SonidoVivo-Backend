@@ -105,4 +105,20 @@ module.exports = {
       },
     },
   },
+  '/catalogo/{id}/activar': {
+    patch: {
+      tags: ['Catálogo'],
+      summary: 'Activar un producto',
+      description: 'Reactiva un producto previamente desactivado. Solo el Administrador puede usar esta ruta.',
+      security: seguridad,
+      parameters: [parametroProductoId],
+      responses: {
+        200: respuestaProducto('Producto activado correctamente'),
+        401: respuestasProtegidas[401],
+        403: respuestasProtegidas[403],
+        404: respuestaError('El producto no existe', 'Producto no encontrado'),
+        500: respuestasProtegidas[500],
+      },
+    },
+  },
 };

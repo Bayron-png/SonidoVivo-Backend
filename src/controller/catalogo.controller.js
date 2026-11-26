@@ -70,10 +70,23 @@ const desactivarProducto = async (req, res) => {
   }
 };
 
+const activarProducto = async (req, res) => {
+  try {
+    const producto = await catalogoService.activarProducto(req.params.id);
+    return res.json({
+      mensaje: 'Producto activado correctamente',
+      producto,
+    });
+  } catch (error) {
+    return manejarError(error, res, 'activar producto');
+  }
+};
+
 module.exports = {
   listarProductos,
   obtenerProducto,
   crearProducto,
   actualizarProducto,
   desactivarProducto,
+  activarProducto,
 };

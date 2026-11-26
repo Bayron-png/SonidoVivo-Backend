@@ -32,7 +32,7 @@ Se optó por **PostgreSQL** como motor de base de datos relacional
 ### **Seguridad y Autenticación:** JSON Web Tokens ![JWT](https://img.shields.io/badge/JWT-000000?style=flat&logo=jsonwebtokens&logoColor=white)
 Emisión de tokens firmados con tiempo de expiración para autenticar sesiones sin estado (*stateless*).
 
-Las rutas `GET`, `PUT` y `DELETE /api/v1/usuarios` requieren un token JWT enviado
+Las rutas `GET`, `PUT`, `DELETE` y `PATCH /api/v1/usuarios` requieren un token JWT enviado
 como `Authorization: Bearer <token>` y el rol `Administrador`. Sin token se
 responde `401`; con un rol distinto, `403`. Configure `JWT_SECRET` para firmar y
 verificar los tokens.
@@ -68,7 +68,7 @@ La especificación en JSON está disponible en `/api-docs.json`.
    `UPDATE usuarios SET rol_id = 1 WHERE correo = 'tu@correo.cl';`
    Luego hay que volver a hacer login para obtener un token nuevo.
 4. Pulsar **Authorize**, pegar el token (sin la palabra `Bearer`) y cerrar.
-5. Probar `GET /usuarios`, `PUT /usuarios/{id}`, `DELETE /usuarios/{id}` y las operaciones protegidas del catálogo. `GET /catalogo` y `GET /catalogo/{id}` son públicas. Las rutas protegidas responden `403` con un rol distinto y `401` sin token.
+5. Probar `GET /usuarios`, `PUT /usuarios/{id}`, `DELETE /usuarios/{id}`, `PATCH /usuarios/{id}/activar` y las operaciones protegidas del catálogo. `GET /catalogo` y `GET /catalogo/{id}` son públicas. Las rutas protegidas responden `403` con un rol distinto y `401` sin token.
 
 **Endpoints documentados:**
 
@@ -79,11 +79,13 @@ La especificación en JSON está disponible en `/api-docs.json`.
 | GET | `/api/v1/usuarios` | Administrador |
 | PUT | `/api/v1/usuarios/:id` | Administrador |
 | DELETE | `/api/v1/usuarios/:id` | Administrador |
+| PATCH | `/api/v1/usuarios/:id/activar` | Administrador |
 | GET | `/api/v1/catalogo` | Público |
 | GET | `/api/v1/catalogo/:id` | Público |
 | POST | `/api/v1/catalogo` | Administrador |
 | PUT | `/api/v1/catalogo/:id` | Administrador |
 | DELETE | `/api/v1/catalogo/:id` | Administrador |
+| PATCH | `/api/v1/catalogo/:id/activar` | Administrador |
 
 ## Instalación y ejecución local
 
@@ -241,11 +243,13 @@ Las rutas no acceden directamente a la base de datos: los controladores delegan 
 | **Modificar usuario** | Listo | Endpoint `PUT /api/v1/usuarios/:id` operativo; permite actualizar nombre, correo y rol. Requiere token JWT de administrador. |
 | **Listar usuarios** | Listo | Endpoint `GET /api/v1/usuarios` operativo. Requiere token JWT de administrador. |
 | **Eliminar o desactivar usuario** | Listo | Endpoint `DELETE /api/v1/usuarios/:id` operativo; desactiva al usuario sin borrar sus datos. Requiere token JWT de administrador. |
+| **Activar usuario** | Listo | Endpoint `PATCH /api/v1/usuarios/:id/activar` operativo. Requiere token JWT de administrador. |
 | **Listar productos** | Listo | Endpoint público `GET /api/v1/catalogo`. Devuelve los productos activos almacenados en PostgreSQL. |
 | **Consultar producto** | Listo | Endpoint público `GET /api/v1/catalogo/:id`. Busca un producto por su código, como `GA001`. |
 | **Crear producto** | Listo | Endpoint `POST /api/v1/catalogo`. Requiere token JWT de administrador. |
 | **Modificar producto** | Listo | Endpoint `PUT /api/v1/catalogo/:id`. Permite modificar los campos enviados y requiere token JWT de administrador. |
 | **Eliminar o desactivar producto** | Listo | Endpoint `DELETE /api/v1/catalogo/:id`. Desactiva el producto sin eliminarlo y requiere token JWT de administrador. |
+| **Activar producto** | Listo | Endpoint `PATCH /api/v1/catalogo/:id/activar`. Reactiva el producto y requiere token JWT de administrador. |
 
 ### Catálogo de productos
 
@@ -258,12 +262,13 @@ GET /api/v1/catalogo/GA001
 
 `GET /api/v1/catalogo` devuelve todos los productos activos. `GET /api/v1/catalogo/:id` devuelve un producto por su código.
 
-Crear, modificar y desactivar productos requiere iniciar sesión como administrador y enviar el token JWT:
+Crear, modificar, desactivar y activar productos requiere iniciar sesión como administrador y enviar el token JWT:
 
 ```text
 POST /api/v1/catalogo
 PUT /api/v1/catalogo/:id
 DELETE /api/v1/catalogo/:id
+PATCH /api/v1/catalogo/:id/activar
 Authorization: Bearer <token>
 ```
 
