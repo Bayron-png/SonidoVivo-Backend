@@ -56,7 +56,7 @@ pool.query('SELECT NOW()')
     obtenerIPv4()
       .then((ipv4) => {
         const port = process.env.PORT || 3000;
-        console.log(`\u2FCB URL Documentacion: http://${ipv4}:${port}/api-docs \u2FCB\n`);
+        console.log(`\u2FCB URL Documentacion: http://${ipv4}:${port}/api-docs/ \u2FCB\n`);
       })
       .catch((err) => {
         console.error('No se pudo determinar la IPv4 pública:', err.message);

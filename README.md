@@ -21,7 +21,7 @@ Este backend implementa funcionalidades como:
 Se optó por usar `Node.js` y `Express` debido a los siguientes motivos:
 - **Cohesión Fullstack:** Al utilizar React en el frontend, mantener JavaScript en el servidor unifica las tecnologías del equipo, simplificando el manejo de objetos JSON entre cliente y API.
 - **Endpoints:** Express permite modularizar rutas mediante `express.Router()`, separando cada recurso en su propio archivo de forma ordenada.
-- **Compatabilidad con Swagger:** Express integra de forma nativa `swagger-ui-express` (con una especificación OpenAPI 3 en `src/config/swagger.js`), permitiendo levantar documentacion interactiva en /api-docs.
+- **Compatabilidad con Swagger:** Express integra de forma nativa `swagger-ui-express` (con una especificación OpenAPI 3 en `src/config/swagger.js`, organizada por módulos en `src/config/swagger/`), permitiendo levantar documentacion interactiva en /api-docs.
 **Base de Datos**
 
 ### **Base de datos:** PostgreSQL ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=flat&logo=postgresql&logoColor=white)
@@ -52,7 +52,7 @@ Se eligió desplegar el backend en una instancia **Amazon EC2** en lugar de una 
 
 
 ### **Documentación API:** Swagger
-Documentación interactiva con **Swagger UI** (OpenAPI 3), definida en `src/config/swagger.js`. Permite ver los esquemas de entrada y salida, los códigos HTTP de cada endpoint (`200`, `201`, `400`, `401`, `403`, `404`) y probar las rutas desde el navegador.
+Documentación interactiva con **Swagger UI** (OpenAPI 3), compuesta en `src/config/swagger.js` y organizada por módulo (`auth.js`, `usuarios.js` y `catalogo.js`) en `src/config/swagger/`. Permite ver los esquemas de entrada y salida, los códigos HTTP de cada endpoint (`200`, `201`, `400`, `401`, `403`, `404`) y probar las rutas desde el navegador; todas siguen apareciendo juntas en `/api-docs`.
 
 | Entorno | Dirección |
 | :--- | :--- |
@@ -212,7 +212,10 @@ El backend está organizado bajo una arquitectura en capas (**Model - Repository
 ```
 sonidovivo-backend/
 ├── src/
-│   ├── config/          # Conexión a PostgreSQL
+│   ├── config/
+│   │   ├── swagger/     # Documentación por módulo y helpers compartidos
+│   │   ├── db.js        # Conexión a PostgreSQL
+│   │   └── swagger.js   # Composición de la especificación OpenAPI
 │   ├── controller/      # Traducción entre HTTP y servicios
 │   ├── database/        # Script para cargar las tablas de la base de datos
 │   ├── middleware/      # Validación de JWT y autorización por rol administrador
