@@ -1,6 +1,7 @@
 const authPaths = require('./swagger/auth');
 const usuarioPaths = require('./swagger/usuarios');
 const catalogoPaths = require('./swagger/catalogo');
+const pedidoPaths = require('./swagger/pedidos');
 
 const swaggerSpec = {
   openapi: '3.0.3',
@@ -18,11 +19,13 @@ const swaggerSpec = {
     { name: 'Autenticación', description: 'Registro e inicio de sesión (rutas públicas)' },
     { name: 'Usuarios', description: 'Gestión de usuarios (solo Administrador)' },
     { name: 'Catálogo', description: 'Consulta pública y gestión de productos (gestión solo Administrador)' },
+    {name: 'Pedidos', description: 'Creación, consultas, cambios de estado y cancelación de pedidos'},
   ],
   paths: {
     ...authPaths,
     ...usuarioPaths,
     ...catalogoPaths,
+    ...pedidoPaths,
   },
   components: {
     securitySchemes: {
