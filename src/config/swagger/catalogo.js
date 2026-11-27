@@ -121,4 +121,44 @@ module.exports = {
       },
     },
   },
+  '/catalogo/{id}/stock': {
+    patch: {
+      tags: ['Catálogo'],
+      summary: 'Actualizar stock de un producto',
+      description: 'Disponible para Administrador y Vendedor.',
+      security: seguridad,
+      parameters: [parametroProductoId],
+      requestBody: {
+        required: true,
+        content: {
+          'application/json': {
+            schema: {
+              type: 'object',
+              required: ['stock'],
+              additionalProperties: false,
+              properties: {
+                stock: {
+                  type: 'integer',
+                  minimum: 0,
+                  maximum: 2147483647,
+                  example: 5
+                }
+              }
+            }
+          }
+        }
+      },
+      responses: {
+        200: respuestaProducto('Stock actualizado correctamente'),
+        400: respuestaError(
+          'Stock inválido',
+          'Debe enviar únicamente un stock entero mayor o igual a cero'
+        ),
+        401: respuestasProtegidas[401],
+        403: respuestasProtegidas[403],
+        404: respuestaError('Producto inexistente', 'Producto no encontrado'),
+        500: respuestasProtegidas[500]
+      }
+    }
+  },
 };

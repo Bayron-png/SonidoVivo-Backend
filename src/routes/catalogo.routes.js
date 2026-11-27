@@ -8,6 +8,7 @@ const {
   actualizarProducto,
   desactivarProducto,
   activarProducto,
+  actualizarStock,
 } = require('../controller/catalogo.controller');
 
 const {
@@ -17,6 +18,13 @@ const {
 
 router.get('/', listarProductos);
 router.get('/:id', obtenerProducto);
+
+router.patch(
+  '/:id/stock',
+  verificarToken,
+  autorizarRoles('Administrador', 'Vendedor'),
+  actualizarStock
+);
 
 router.use(
   verificarToken,
