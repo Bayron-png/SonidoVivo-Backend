@@ -42,8 +42,21 @@ const eliminarUsuario = async (req, res) => {
   }
 };
 
+const activarUsuario = async (req, res) => {
+  try {
+    const usuario = await usuarioService.activarUsuario(req.params.id);
+    return res.json({
+      mensaje: 'Usuario activado correctamente',
+      usuario,
+    });
+  } catch (error) {
+    return handleError(error, res, 'activar usuario');
+  }
+};
+
 module.exports = {
   listarUsuarios,
   actualizarUsuario,
   eliminarUsuario,
+  activarUsuario,
 };

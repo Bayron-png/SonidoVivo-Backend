@@ -31,6 +31,14 @@ const desactivarUsuario = async (id) => {
   return result.rows[0] || null;
 };
 
+const activarUsuario = async (id) => {
+  const result = await pool.query(
+    'UPDATE usuarios SET activo = TRUE WHERE id = $1 RETURNING id, correo, activo',
+    [id]
+  );
+  return result.rows[0] || null;
+};
+
 const existeRol = async (id) => {
   const result = await pool.query(
     'SELECT 1 FROM roles WHERE id = $1',
@@ -44,5 +52,6 @@ module.exports = {
   listarUsuarios,
   actualizarUsuario,
   desactivarUsuario,
+  activarUsuario,
   existeRol,
 };

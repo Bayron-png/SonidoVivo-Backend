@@ -21,7 +21,7 @@ Este backend implementa funcionalidades como:
 Se optó por usar `Node.js` y `Express` debido a los siguientes motivos:
 - **Cohesión Fullstack:** Al utilizar React en el frontend, mantener JavaScript en el servidor unifica las tecnologías del equipo, simplificando el manejo de objetos JSON entre cliente y API.
 - **Endpoints:** Express permite modularizar rutas mediante `express.Router()`, separando cada recurso en su propio archivo de forma ordenada.
-- **Compatabilidad con Swagger:** Express integra de forma nativa `swagger-ui-express` (con una especificación OpenAPI 3 en `src/config/swagger.js`), permitiendo levantar documentacion interactiva en /api-docs.
+- **Compatabilidad con Swagger:** Express integra de forma nativa `swagger-ui-express` (con una especificación OpenAPI 3 en `src/config/swagger.js`, organizada por módulos en `src/config/swagger/`), permitiendo levantar documentacion interactiva en /api-docs.
 **Base de Datos**
 
 ### **Base de datos:** PostgreSQL ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=flat&logo=postgresql&logoColor=white)
@@ -32,7 +32,7 @@ Se optó por **PostgreSQL** como motor de base de datos relacional
 ### **Seguridad y Autenticación:** JSON Web Tokens ![JWT](https://img.shields.io/badge/JWT-000000?style=flat&logo=jsonwebtokens&logoColor=white)
 Emisión de tokens firmados con tiempo de expiración para autenticar sesiones sin estado (*stateless*).
 
-Las rutas `GET`, `PUT` y `DELETE /api/v1/usuarios` requieren un token JWT enviado
+Las rutas `GET`, `PUT`, `DELETE` y `PATCH /api/v1/usuarios` requieren un token JWT enviado
 como `Authorization: Bearer <token>` y el rol `Administrador`. Sin token se
 responde `401`; con un rol distinto, `403`. Configure `JWT_SECRET` para firmar y
 verificar los tokens.
@@ -52,7 +52,7 @@ Se eligió desplegar el backend en una instancia **Amazon EC2** en lugar de una 
 
 
 ### **Documentación API:** Swagger
-Documentación interactiva con **Swagger UI** (OpenAPI 3), definida en `src/config/swagger.js`. Permite ver los esquemas de entrada y salida, los códigos HTTP de cada endpoint (`200`, `201`, `400`, `401`, `403`, `404`) y probar las rutas desde el navegador.
+Documentación interactiva con **Swagger UI** (OpenAPI 3), compuesta en `src/config/swagger.js` y organizada por módulo (`auth.js`, `usuarios.js` y `catalogo.js`) en `src/config/swagger/`. Permite ver los esquemas de entrada y salida, los códigos HTTP de cada endpoint (`200`, `201`, `400`, `401`, `403`, `404`) y probar las rutas desde el navegador; todas siguen apareciendo juntas en `/api-docs`.
 
 | Entorno | Dirección |
 | :--- | :--- |
@@ -68,7 +68,7 @@ La especificación en JSON está disponible en `/api-docs.json`.
    `UPDATE usuarios SET rol_id = 1 WHERE correo = 'tu@correo.cl';`
    Luego hay que volver a hacer login para obtener un token nuevo.
 4. Pulsar **Authorize**, pegar el token (sin la palabra `Bearer`) y cerrar.
-5. Probar `GET /usuarios`, `PUT /usuarios/{id}`, `DELETE /usuarios/{id}` y las operaciones protegidas del catálogo. `GET /catalogo` y `GET /catalogo/{id}` son públicas. Las rutas protegidas responden `403` con un rol distinto y `401` sin token.
+5. Probar `GET /usuarios`, `PUT /usuarios/{id}`, `DELETE /usuarios/{id}`, `PATCH /usuarios/{id}/activar` y las operaciones protegidas del catálogo. `GET /catalogo` y `GET /catalogo/{id}` son públicas. Las rutas protegidas responden `403` con un rol distinto y `401` sin token.
 
 **Endpoints documentados:**
 
@@ -79,11 +79,13 @@ La especificación en JSON está disponible en `/api-docs.json`.
 | GET | `/api/v1/usuarios` | Administrador |
 | PUT | `/api/v1/usuarios/:id` | Administrador |
 | DELETE | `/api/v1/usuarios/:id` | Administrador |
+| PATCH | `/api/v1/usuarios/:id/activar` | Administrador |
 | GET | `/api/v1/catalogo` | Público |
 | GET | `/api/v1/catalogo/:id` | Público |
 | POST | `/api/v1/catalogo` | Administrador |
 | PUT | `/api/v1/catalogo/:id` | Administrador |
 | DELETE | `/api/v1/catalogo/:id` | Administrador |
+| PATCH | `/api/v1/catalogo/:id/activar` | Administrador |
 
 ## Instalación y ejecución local
 
@@ -212,7 +214,10 @@ El backend está organizado bajo una arquitectura en capas (**Model - Repository
 ```
 sonidovivo-backend/
 ├── src/
-│   ├── config/          # Conexión a PostgreSQL
+│   ├── config/
+│   │   ├── swagger/     # Documentación por módulo y helpers compartidos
+│   │   ├── db.js        # Conexión a PostgreSQL
+│   │   └── swagger.js   # Composición de la especificación OpenAPI
 │   ├── controller/      # Traducción entre HTTP y servicios
 │   ├── database/        # Script para cargar las tablas de la base de datos
 │   ├── middleware/      # Validación de JWT y autorización por rol administrador
@@ -238,11 +243,13 @@ Las rutas no acceden directamente a la base de datos: los controladores delegan 
 | **Modificar usuario** | Listo | Endpoint `PUT /api/v1/usuarios/:id` operativo; permite actualizar nombre, correo y rol. Requiere token JWT de administrador. |
 | **Listar usuarios** | Listo | Endpoint `GET /api/v1/usuarios` operativo. Requiere token JWT de administrador. |
 | **Eliminar o desactivar usuario** | Listo | Endpoint `DELETE /api/v1/usuarios/:id` operativo; desactiva al usuario sin borrar sus datos. Requiere token JWT de administrador. |
+| **Activar usuario** | Listo | Endpoint `PATCH /api/v1/usuarios/:id/activar` operativo. Requiere token JWT de administrador. |
 | **Listar productos** | Listo | Endpoint público `GET /api/v1/catalogo`. Devuelve los productos activos almacenados en PostgreSQL. |
 | **Consultar producto** | Listo | Endpoint público `GET /api/v1/catalogo/:id`. Busca un producto por su código, como `GA001`. |
 | **Crear producto** | Listo | Endpoint `POST /api/v1/catalogo`. Requiere token JWT de administrador. |
 | **Modificar producto** | Listo | Endpoint `PUT /api/v1/catalogo/:id`. Permite modificar los campos enviados y requiere token JWT de administrador. |
 | **Eliminar o desactivar producto** | Listo | Endpoint `DELETE /api/v1/catalogo/:id`. Desactiva el producto sin eliminarlo y requiere token JWT de administrador. |
+| **Activar producto** | Listo | Endpoint `PATCH /api/v1/catalogo/:id/activar`. Reactiva el producto y requiere token JWT de administrador. |
 
 ### Catálogo de productos
 
@@ -255,12 +262,13 @@ GET /api/v1/catalogo/GA001
 
 `GET /api/v1/catalogo` devuelve todos los productos activos. `GET /api/v1/catalogo/:id` devuelve un producto por su código.
 
-Crear, modificar y desactivar productos requiere iniciar sesión como administrador y enviar el token JWT:
+Crear, modificar, desactivar y activar productos requiere iniciar sesión como administrador y enviar el token JWT:
 
 ```text
 POST /api/v1/catalogo
 PUT /api/v1/catalogo/:id
 DELETE /api/v1/catalogo/:id
+PATCH /api/v1/catalogo/:id/activar
 Authorization: Bearer <token>
 ```
 

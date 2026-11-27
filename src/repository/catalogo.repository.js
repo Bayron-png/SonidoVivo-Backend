@@ -100,6 +100,18 @@ const desactivarProducto = async (id) => {
   return result.rows[0] || null;
 };
 
+const activarProducto = async (id) => {
+  const result = await pool.query(
+    `UPDATE productos
+     SET activo = TRUE
+     WHERE id = $1
+     RETURNING id, nombre, categoria, categoria_slug, marca, modelo,
+               stock, precio, descripcion, imagen, activo`,
+    [id]
+  );
+  return result.rows[0] || null;
+};
+
 module.exports = {
   listarProductos,
   obtenerProducto,
@@ -107,4 +119,5 @@ module.exports = {
   crearProducto,
   actualizarProducto,
   desactivarProducto,
+  activarProducto,
 };

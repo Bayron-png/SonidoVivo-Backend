@@ -7,6 +7,7 @@ const {
   crearProducto,
   actualizarProducto,
   desactivarProducto,
+  activarProducto,
 } = require('../controller/catalogo.controller');
 
 const {
@@ -25,5 +26,6 @@ router.use(
 router.post('/', crearProducto);
 router.put('/:id', actualizarProducto);
 router.delete('/:id', desactivarProducto);
+router.patch('/:id/activar', activarProducto);
 
 module.exports = router;

@@ -101,8 +101,21 @@ const eliminarUsuario = async (id) => {
   return usuarioModel.desdeFila(usuario);
 };
 
+const activarUsuario = async (id) => {
+  validarId(id);
+
+  const usuario = await usuarioRepository.activarUsuario(id);
+
+  if (!usuario) {
+    throw new AppError('Usuario no encontrado', 404);
+  }
+
+  return usuarioModel.desdeFila(usuario);
+};
+
 module.exports = {
   listarUsuarios,
   actualizarUsuario,
   eliminarUsuario,
+  activarUsuario,
 };
