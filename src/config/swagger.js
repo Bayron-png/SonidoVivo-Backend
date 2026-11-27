@@ -52,7 +52,9 @@ const swaggerSpec = {
         properties: {
           nombre: { type: 'string', example: 'Juan P. Soto' },
           correo: { type: 'string', format: 'email', example: 'juan.soto@correo.cl' },
-          rol_id: { type: 'integer', example: 3 },
+          rol_id: {
+            type: 'integer', minimum: 1, example: 2, description: 'ID de un rol existente en PostgreSQL'
+          },
         },
       },
       CrearProductoRequest: {
@@ -140,6 +142,35 @@ const swaggerSpec = {
             },
           },
         },
+      },
+      CrearUsuarioAdminRequest: {
+        type: 'object',
+        required: ['nombre', 'correo', 'password', 'rol_id'],
+        additionalProperties: false,
+        properties: {
+          nombre: {
+            type: 'string',
+            maxLength: 100,
+            example: 'Usuario de Prueba'
+          },
+          correo: {
+            type: 'string',
+            format: 'email',
+            maxLength: 150,
+            example: 'prueba@sonidovivo.local'
+          },
+          password: {
+            type: 'string',
+            format: 'password',
+            minLength: 8,
+            example: 'Cliente123!'
+          },
+          rol_id: {
+            type: 'integer',
+            minimum: 1,
+            description: 'ID de un rol existente en PostgreSQL'
+          }
+        }
       },
     },
   },

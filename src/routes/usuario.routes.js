@@ -3,6 +3,8 @@ const router = express.Router();
 
 const {
   listarUsuarios,
+  obtenerUsuarioPorId,
+  crearUsuario,
   actualizarUsuario,
   eliminarUsuario,
   activarUsuario,
@@ -19,6 +21,8 @@ router.use(
 );
 
 router.get('/', listarUsuarios);
+router.post('/', crearUsuario);
+router.get('/:id', obtenerUsuarioPorId);
 router.put('/:id', actualizarUsuario);
 router.delete('/:id', eliminarUsuario);
 router.patch('/:id/activar', activarUsuario);

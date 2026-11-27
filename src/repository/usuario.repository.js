@@ -10,6 +10,49 @@ const listarUsuarios = async () => {
   return result.rows;
 };
 
+const obtenerUsuarioPorId = async (id) => {
+  const result = await pool.query(
+    `SELECT
+       u.id,
+       u.nombre,
+       u.correo,
+       u.rol_id,
+       r.nombre AS rol,
+       u.activo,
+       u.creado_en
+     FROM usuarios u
+     INNER JOIN roles r ON u.rol_id = r.id
+     WHERE u.id = $1`,
+    [id]
+  );
+
+  return result.rows[0] || null;
+};
+
+const crearUsuario = async ({ nombre, correo, passwordHash, rolId }) => {
+  const result = await pool.query(
+    `WITH nuevo_usuario AS (
+       INSERT INTO usuarios (nombre, correo, password_hash, rol_id)
+       VALUES ($1, $2, $3, $4)
+       RETURNING id, nombre, correo, rol_id, activo, creado_en
+     )
+     SELECT
+       u.id,
+       u.nombre,
+       u.correo,
+       u.rol_id,
+       r.nombre AS rol,
+       u.activo,
+       u.creado_en
+     FROM nuevo_usuario u
+     INNER JOIN roles r ON u.rol_id = r.id`,
+    [nombre, correo, passwordHash, rolId]
+  );
+
+  return result.rows[0];
+};
+
+
 const actualizarUsuario = async (id, { nombre, correo, rol_id }) => {
   const result = await pool.query(
     `UPDATE usuarios
@@ -50,6 +93,8 @@ const existeRol = async (id) => {
 
 module.exports = {
   listarUsuarios,
+  obtenerUsuarioPorId,
+  crearUsuario,
   actualizarUsuario,
   desactivarUsuario,
   activarUsuario,
