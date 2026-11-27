@@ -36,9 +36,22 @@ const buscarUsuarioActivoPorCorreo = async (correo) => {
   return result.rows[0] || null;
 };
 
+const buscarUsuarioActivoPorId = async (id) => {
+  const result = await pool.query(
+    `SELECT u.id, u.nombre, u.correo, r.nombre AS rol
+     FROM usuarios u
+     INNER JOIN roles r ON u.rol_id = r.id
+     WHERE u.id = $1 AND u.activo = TRUE`,
+    [id]
+  );
+
+  return result.rows[0] || null;
+};
+
 module.exports = {
   buscarUsuarioPorCorreo,
   buscarRolCliente,
   crearUsuario,
   buscarUsuarioActivoPorCorreo,
+  buscarUsuarioActivoPorId,
 };

@@ -123,6 +123,39 @@ const activarProducto = async (id) => {
   return producto;
 };
 
+const actualizarStock = async (id, datos) => {
+  if (typeof id !== 'string' || !id.trim()) {
+    throw new AppError('ID de producto inválido', 400);
+  }
+
+  if (
+    !datos ||
+    typeof datos !== 'object' ||
+    Array.isArray(datos) ||
+    Object.keys(datos).length !== 1 ||
+    !Object.hasOwn(datos, 'stock') ||
+    !Number.isInteger(datos.stock) ||
+    datos.stock < 0 ||
+    datos.stock > 2147483647
+  ) {
+    throw new AppError(
+      'Debe enviar únicamente un stock entero mayor o igual a cero',
+      400
+    );
+  }
+
+  const producto = await catalogoRepository.actualizarStock(
+    id.trim().toUpperCase(),
+    datos.stock
+  );
+
+  if (!producto) {
+    throw new AppError('Producto no encontrado', 404);
+  }
+
+  return producto;
+};
+
 module.exports = {
   listarProductos,
   obtenerProducto,
@@ -130,4 +163,5 @@ module.exports = {
   actualizarProducto,
   desactivarProducto,
   activarProducto,
+  actualizarStock,
 };

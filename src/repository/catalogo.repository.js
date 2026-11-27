@@ -112,6 +112,20 @@ const activarProducto = async (id) => {
   return result.rows[0] || null;
 };
 
+const actualizarStock = async (id, stock) => {
+  const result = await pool.query(
+    `UPDATE productos
+     SET stock = $1
+     WHERE id = $2 AND activo = TRUE
+     RETURNING id, nombre, categoria, categoria_slug,
+               marca, modelo, stock, precio,
+               descripcion, imagen, activo`,
+    [stock, id]
+  );
+
+  return result.rows[0] || null;
+};
+
 module.exports = {
   listarProductos,
   obtenerProducto,
@@ -120,4 +134,5 @@ module.exports = {
   actualizarProducto,
   desactivarProducto,
   activarProducto,
+  actualizarStock,
 };

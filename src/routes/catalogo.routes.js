@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+
 const {
   listarProductos,
   obtenerProducto,
@@ -7,14 +8,32 @@ const {
   actualizarProducto,
   desactivarProducto,
   activarProducto,
+  actualizarStock,
 } = require('../controller/catalogo.controller');
-const { verificarTokenAdmin } = require('../middleware/auth.middleware');
+
+const {
+  verificarToken,
+  autorizarRoles
+} = require('../middleware/auth.middleware');
 
 router.get('/', listarProductos);
 router.get('/:id', obtenerProducto);
-router.post('/', verificarTokenAdmin, crearProducto);
-router.put('/:id', verificarTokenAdmin, actualizarProducto);
-router.delete('/:id', verificarTokenAdmin, desactivarProducto);
-router.patch('/:id/activar', verificarTokenAdmin, activarProducto);
+
+router.patch(
+  '/:id/stock',
+  verificarToken,
+  autorizarRoles('Administrador', 'Vendedor'),
+  actualizarStock
+);
+
+router.use(
+  verificarToken,
+  autorizarRoles('Administrador')
+);
+
+router.post('/', crearProducto);
+router.put('/:id', actualizarProducto);
+router.delete('/:id', desactivarProducto);
+router.patch('/:id/activar', activarProducto);
 
 module.exports = router;

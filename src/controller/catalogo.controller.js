@@ -82,6 +82,22 @@ const activarProducto = async (req, res) => {
   }
 };
 
+const actualizarStock = async (req, res) => {
+  try {
+    const producto = await catalogoService.actualizarStock(
+      req.params.id,
+      req.body
+    );
+
+    return res.json({
+      mensaje: 'Stock actualizado correctamente',
+      producto,
+    });
+  } catch (error) {
+    return manejarError(error, res, 'actualizar stock');
+  }
+};
+
 module.exports = {
   listarProductos,
   obtenerProducto,
@@ -89,4 +105,5 @@ module.exports = {
   actualizarProducto,
   desactivarProducto,
   activarProducto,
+  actualizarStock,
 };

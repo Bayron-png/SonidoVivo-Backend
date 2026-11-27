@@ -1,6 +1,7 @@
 const authPaths = require('./swagger/auth');
 const usuarioPaths = require('./swagger/usuarios');
 const catalogoPaths = require('./swagger/catalogo');
+const pedidoPaths = require('./swagger/pedidos');
 
 const swaggerSpec = {
   openapi: '3.0.3',
@@ -18,11 +19,13 @@ const swaggerSpec = {
     { name: 'Autenticación', description: 'Registro e inicio de sesión (rutas públicas)' },
     { name: 'Usuarios', description: 'Gestión de usuarios (solo Administrador)' },
     { name: 'Catálogo', description: 'Consulta pública y gestión de productos (gestión solo Administrador)' },
+    {name: 'Pedidos', description: 'Creación, consultas, cambios de estado y cancelación de pedidos'},
   ],
   paths: {
     ...authPaths,
     ...usuarioPaths,
     ...catalogoPaths,
+    ...pedidoPaths,
   },
   components: {
     securitySchemes: {
@@ -52,7 +55,9 @@ const swaggerSpec = {
         properties: {
           nombre: { type: 'string', example: 'Juan P. Soto' },
           correo: { type: 'string', format: 'email', example: 'juan.soto@correo.cl' },
-          rol_id: { type: 'integer', example: 3 },
+          rol_id: {
+            type: 'integer', minimum: 1, example: 2, description: 'ID de un rol existente en PostgreSQL'
+          },
         },
       },
       CrearProductoRequest: {
@@ -140,6 +145,35 @@ const swaggerSpec = {
             },
           },
         },
+      },
+      CrearUsuarioAdminRequest: {
+        type: 'object',
+        required: ['nombre', 'correo', 'password', 'rol_id'],
+        additionalProperties: false,
+        properties: {
+          nombre: {
+            type: 'string',
+            maxLength: 100,
+            example: 'Usuario de Prueba'
+          },
+          correo: {
+            type: 'string',
+            format: 'email',
+            maxLength: 150,
+            example: 'prueba@sonidovivo.local'
+          },
+          password: {
+            type: 'string',
+            format: 'password',
+            minLength: 8,
+            example: 'Cliente123!'
+          },
+          rol_id: {
+            type: 'integer',
+            minimum: 1,
+            description: 'ID de un rol existente en PostgreSQL'
+          }
+        }
       },
     },
   },

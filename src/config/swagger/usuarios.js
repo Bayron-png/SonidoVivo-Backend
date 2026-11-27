@@ -24,13 +24,60 @@ module.exports = {
         ...respuestasProtegidas,
       },
     },
+    post: {
+      tags: ['Usuarios'],
+      summary: 'Crear usuario como administrador',
+      description: 'Crea un usuario y permite seleccionar un rol existente.',
+      security: seguridad,
+      requestBody: {
+        required: true,
+        content: {
+          'application/json': {
+            schema: {
+              $ref: '#/components/schemas/CrearUsuarioAdminRequest'
+            }
+          }
+        }
+      },
+      responses: {
+        201: respuestaUsuario('Usuario creado correctamente'),
+        400: respuestaError('Datos inválidos', 'El rol no existe'),
+        409: respuestaError('Correo duplicado', 'El correo ya está registrado'),
+        ...respuestasProtegidas
+      }
+    },
   },
   '/usuarios/{id}': {
+
+    get: {
+      tags: ['Usuarios'],
+      summary: 'Obtener usuario por ID',
+      description: 'Consulta los datos de un usuario, incluyendo cuentas desactivadas.',
+      security: seguridad,
+      parameters: [parametroId],
+      responses: {
+        200: {
+          description: 'Usuario encontrado',
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/Usuario'
+              }
+            }
+          }
+        },
+        400: respuestaError('ID inválido', 'El ID debe ser un entero positivo'),
+        404: respuestaError('Usuario inexistente', 'Usuario no encontrado'),
+        ...respuestasProtegidas
+      }
+    },
+
     put: {
       tags: ['Usuarios'],
       summary: 'Modificar un usuario',
       description:
-        'Permite cambiar nombre, correo y rol (`rol_id`: 1 = Administrador, 2 = Cliente, 3 = Vendedor). '
+        'Permite cambiar nombre, correo y rol. El rol debe existir en PostgreSQL. '
+        + 'Actualmente están disponibles Administrador y Cliente; Vendedor se incorporará posteriormente. '
         + 'Solo el Administrador puede usar esta ruta.',
       security: seguridad,
       parameters: [parametroId],

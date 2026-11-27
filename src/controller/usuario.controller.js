@@ -18,6 +18,31 @@ const listarUsuarios = async (req, res) => {
   }
 };
 
+const obtenerUsuarioPorId = async (req, res) => {
+  try {
+    const usuario = await usuarioService.obtenerUsuarioPorId(
+      req.params.id
+    );
+
+    return res.json(usuario);
+  } catch (error) {
+    return handleError(error, res, 'obtener usuario');
+  }
+};
+
+const crearUsuario = async (req, res) => {
+  try {
+    const usuario = await usuarioService.crearUsuario(req.body);
+
+    return res.status(201).json({
+      mensaje: 'Usuario creado correctamente',
+      usuario,
+    });
+  } catch (error) {
+    return handleError(error, res, 'crear usuario');
+  }
+};
+
 const actualizarUsuario = async (req, res) => {
   try {
     const usuario = await usuarioService.actualizarUsuario(req.params.id, req.body);
@@ -56,6 +81,8 @@ const activarUsuario = async (req, res) => {
 
 module.exports = {
   listarUsuarios,
+  obtenerUsuarioPorId,
+  crearUsuario,
   actualizarUsuario,
   eliminarUsuario,
   activarUsuario,
