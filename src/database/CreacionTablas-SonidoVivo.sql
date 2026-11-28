@@ -7,7 +7,8 @@ CREATE TABLE IF NOT EXISTS roles (
 -- 2. Roles existentes en SonidoVivo (id = 1: Administrador, id = 2: Cliente)
 INSERT INTO roles (nombre) VALUES
 ('Administrador'),
-('Cliente')
+('Cliente'),
+('Vendedor')
 ON CONFLICT (nombre) DO NOTHING;
 
 -- 3. Tabla de usuarios
@@ -107,3 +108,59 @@ INSERT INTO productos (id, nombre, categoria, categoria_slug, marca, modelo, sto
 INSERT INTO productos (id, nombre, categoria, categoria_slug, marca, modelo, stock, precio, descripcion, imagen) VALUES ('ES003', 'Auriculares de Estudio Pro', 'Estudio y Grabación', 'estudio-y-grabacion', 'Audio-Tech.', 'ATH-M50x', '4', '219990', 'Referencia de industria, sonido neutro y detallado.', '/productos/estudio-grabacion/es003.png') ON CONFLICT (id) DO UPDATE SET nombre = EXCLUDED.nombre, categoria = EXCLUDED.categoria, categoria_slug = EXCLUDED.categoria_slug, marca = EXCLUDED.marca, modelo = EXCLUDED.modelo, stock = EXCLUDED.stock, precio = EXCLUDED.precio, descripcion = EXCLUDED.descripcion, imagen = EXCLUDED.imagen, activo = TRUE;
 INSERT INTO productos (id, nombre, categoria, categoria_slug, marca, modelo, stock, precio, descripcion, imagen) VALUES ('ES004', 'Monitor de Estudio 5"', 'Estudio y Grabación', 'estudio-y-grabacion', 'Yamaha', 'HS5', '2', '349990', 'Altavoz activo, respuesta plana, ideal mezcla.', '/productos/estudio-grabacion/es004.png') ON CONFLICT (id) DO UPDATE SET nombre = EXCLUDED.nombre, categoria = EXCLUDED.categoria, categoria_slug = EXCLUDED.categoria_slug, marca = EXCLUDED.marca, modelo = EXCLUDED.modelo, stock = EXCLUDED.stock, precio = EXCLUDED.precio, descripcion = EXCLUDED.descripcion, imagen = EXCLUDED.imagen, activo = TRUE;
 INSERT INTO productos (id, nombre, categoria, categoria_slug, marca, modelo, stock, precio, descripcion, imagen) VALUES ('ES005', 'Pop Filter para Micrófono', 'Estudio y Grabación', 'estudio-y-grabacion', 'Sennheiser', 'MZP 40', '8', '14990', 'Doble malla, brazo flexible con clip.', '/productos/estudio-grabacion/es005.png') ON CONFLICT (id) DO UPDATE SET nombre = EXCLUDED.nombre, categoria = EXCLUDED.categoria, categoria_slug = EXCLUDED.categoria_slug, marca = EXCLUDED.marca, modelo = EXCLUDED.modelo, stock = EXCLUDED.stock, precio = EXCLUDED.precio, descripcion = EXCLUDED.descripcion, imagen = EXCLUDED.imagen, activo = TRUE;
+
+-- 7. Tabla principal de pedidos
+CREATE TABLE IF NOT EXISTS pedidos (
+    id SERIAL PRIMARY KEY,
+
+    usuario_id INTEGER NOT NULL
+        REFERENCES usuarios(id),
+
+    estado VARCHAR(20) NOT NULL DEFAULT 'Pendiente'
+        CHECK (estado IN (
+            'Pendiente',
+            'Confirmado',
+            'Enviado',
+            'Entregado',
+            'Cancelado'
+        )),
+
+    tipo_envio VARCHAR(15) NOT NULL DEFAULT 'retiro'
+        CHECK (tipo_envio IN ('retiro', 'domicilio')),
+
+    costo_envio INTEGER NOT NULL DEFAULT 0
+        CHECK (costo_envio >= 0),
+
+    total INTEGER NOT NULL DEFAULT 0
+        CHECK (total >= 0),
+
+    creado_en TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    actualizado_en TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Productos incluidos en cada pedido
+CREATE TABLE IF NOT EXISTS pedido_detalles (
+    pedido_id INTEGER NOT NULL
+        REFERENCES pedidos(id) ON DELETE CASCADE,
+
+    producto_id VARCHAR(20) NOT NULL
+        REFERENCES productos(id),
+
+    cantidad INTEGER NOT NULL
+        CHECK (cantidad > 0),
+
+    precio_unitario INTEGER NOT NULL
+        CHECK (precio_unitario >= 0),
+
+    subtotal INTEGER NOT NULL
+        CHECK (subtotal >= 0),
+
+    PRIMARY KEY (pedido_id, producto_id)
+);
+
+-- Índices para consultar pedidos
+CREATE INDEX IF NOT EXISTS idx_pedidos_usuario
+    ON pedidos(usuario_id);
+
+CREATE INDEX IF NOT EXISTS idx_pedidos_estado
+    ON pedidos(estado);
