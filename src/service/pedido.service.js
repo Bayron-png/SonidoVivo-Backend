@@ -159,6 +159,7 @@ const cambiarEstadoPedido = async (id, datos) => {
     }
 
     const estadosPermitidos = [
+        'Pendiente',
         'Confirmado',
         'Enviado',
         'Entregado',

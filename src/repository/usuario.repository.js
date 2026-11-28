@@ -2,10 +2,11 @@ const pool = require('../config/db');
 
 const listarUsuarios = async () => {
   const result = await pool.query(
-    `SELECT u.id, u.nombre, u.correo, r.nombre AS rol, u.activo, u.creado_en
-     FROM usuarios u
-     INNER JOIN roles r ON u.rol_id = r.id
-     ORDER BY u.id ASC`
+    `SELECT u.id, u.nombre, u.correo, u.rol_id,
+       r.nombre AS rol, u.activo, u.creado_en
+        FROM usuarios u
+        INNER JOIN roles r ON u.rol_id = r.id
+        ORDER BY u.id ASC;`
   );
   return result.rows;
 };
