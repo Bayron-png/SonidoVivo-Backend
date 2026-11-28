@@ -52,7 +52,7 @@ Se eligió desplegar el backend en una instancia **Amazon EC2** en lugar de una 
 
 
 ### **Documentación API:** Swagger
-Documentación interactiva con **Swagger UI** (OpenAPI 3), compuesta en `src/config/swagger.js` y organizada por módulo (`auth.js`, `usuarios.js` y `catalogo.js`) en `src/config/swagger/`. Permite ver los esquemas de entrada y salida, los códigos HTTP de cada endpoint (`200`, `201`, `400`, `401`, `403`, `404`) y probar las rutas desde el navegador; todas siguen apareciendo juntas en `/api-docs`.
+Documentación interactiva con **Swagger UI** (OpenAPI 3), compuesta en `src/config/swagger.js` y organizada por módulo (`auth.js`, `usuarios.js`, `catalogo.js` y `pedidos.js`) en `src/config/swagger/`. Permite ver los esquemas de entrada y salida, los códigos HTTP de cada endpoint (`200`, `201`, `400`, `401`, `403`, `404`) y probar las rutas desde el navegador; todas siguen apareciendo juntas en `/api-docs`.
 
 | Entorno | Dirección |
 | :--- | :--- |
@@ -64,11 +64,11 @@ La especificación en JSON está disponible en `/api-docs.json`.
 **Cómo probar rutas protegidas:**
 1. Ejecutar `POST /auth/register` para crear un usuario (se crea con rol `Cliente`).
 2. Ejecutar `POST /auth/login` con ese correo y contraseña, y copiar el `token` de la respuesta.
-3. Las rutas de gestión de `/usuarios` y las operaciones `POST`, `PUT` y `DELETE` de `/catalogo` exigen rol `Administrador`. Por seguridad el registro siempre crea `Cliente`, así que el primer administrador se asciende desde la base de datos:
+3. Las rutas de gestión de `/usuarios` y las operaciones `POST`, `PUT` y `DELETE` de `/catalogo` exigen rol `Administrador`. La actualización de stock requiere rol `Administrador` o `Vendedor`; las rutas de pedidos tienen permisos según la acción, indicados en la tabla. Por seguridad el registro siempre crea `Cliente`, así que el primer administrador se asciende desde la base de datos:
    `UPDATE usuarios SET rol_id = 1 WHERE correo = 'tu@correo.cl';`
    Luego hay que volver a hacer login para obtener un token nuevo.
 4. Pulsar **Authorize**, pegar el token (sin la palabra `Bearer`) y cerrar.
-5. Probar `GET /usuarios`, `PUT /usuarios/{id}`, `DELETE /usuarios/{id}`, `PATCH /usuarios/{id}/activar` y las operaciones protegidas del catálogo. `GET /catalogo` y `GET /catalogo/{id}` son públicas. Las rutas protegidas responden `403` con un rol distinto y `401` sin token.
+5. Probar los endpoints protegidos de usuarios, catálogo y pedidos descritos en la tabla. `GET /catalogo` y `GET /catalogo/{id}` son públicos. Las rutas protegidas responden `403` con un rol distinto y `401` sin token.
 
 **Endpoints documentados:**
 
@@ -77,15 +77,24 @@ La especificación en JSON está disponible en `/api-docs.json`.
 | POST | `/api/v1/auth/register` | Público |
 | POST | `/api/v1/auth/login` | Público |
 | GET | `/api/v1/usuarios` | Administrador |
+| POST | `/api/v1/usuarios` | Administrador |
+| GET | `/api/v1/usuarios/:id` | Administrador |
 | PUT | `/api/v1/usuarios/:id` | Administrador |
 | DELETE | `/api/v1/usuarios/:id` | Administrador |
 | PATCH | `/api/v1/usuarios/:id/activar` | Administrador |
 | GET | `/api/v1/catalogo` | Público |
 | GET | `/api/v1/catalogo/:id` | Público |
+| PATCH | `/api/v1/catalogo/:id/stock` | Administrador, Vendedor |
 | POST | `/api/v1/catalogo` | Administrador |
 | PUT | `/api/v1/catalogo/:id` | Administrador |
 | DELETE | `/api/v1/catalogo/:id` | Administrador |
 | PATCH | `/api/v1/catalogo/:id/activar` | Administrador |
+| POST | `/api/v1/pedidos` | Cliente |
+| GET | `/api/v1/pedidos/mios` | Cliente |
+| GET | `/api/v1/pedidos/:id` | Cliente (propios), Administrador, Vendedor |
+| GET | `/api/v1/pedidos` | Administrador, Vendedor |
+| PATCH | `/api/v1/pedidos/:id/estado` | Administrador, Vendedor |
+| DELETE | `/api/v1/pedidos/:id` | Cliente (propios), Administrador, Vendedor |
 
 ## Instalación y ejecución local
 
